@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"strings"
 )
 
@@ -103,17 +104,23 @@ func (c *Client) UpdateOrgImage(id string, image string) error {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	fw, err := writer.CreateFormFile("image", "image.jpg")
-	if err != nil {
-		return err
-	}
 	img, err := base64.StdEncoding.DecodeString(image)
 	if err != nil {
 		return err
 	}
-	fw.Write(img)
+
+	//---
+	partHeader := textproto.MIMEHeader{}
+	partHeader.Add("Content-Disposition", "form-data; name=\"file\"; filename=\"image.jpg\"")
+	partHeader.Add("Content-Type", "image/jpeg")
+	part, err := writer.CreatePart(partHeader)
+	if err != nil {
+		return err
+	}
+	part.Write(img)
 	writer.Close()
 
+	//---
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/organizations/%s/image/", c.HostURL, id), body)
 	if err != nil {
 		return err
