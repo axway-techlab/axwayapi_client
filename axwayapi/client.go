@@ -29,11 +29,9 @@ func NewClient(host, username, password *string) (*Client, error) {
 
 	c := Client{
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-		// Default Hashicups URL
 		HostURL: *host,
 	}
 
-	// If username or password not provided, return empty client
 	if username == nil || password == nil {
 		return &c, nil
 	}
@@ -46,12 +44,19 @@ func NewClient(host, username, password *string) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) doRequest(req *http.Request) ([]byte, error) {
+func (c *Client) doRequest(req *http.Request, expect... int) ([]byte, error) {
 	username := c.Auth.Username
 	password := c.Auth.Password
 
+	if len(expect) == 0 {
+		// when no expected status code is given, 200 is implied.
+		expect = append(expect, http.StatusOK)
+	}
+
 	req.SetBasicAuth(username,password)
-	req.Header.Set("Content-Type", "application/json")
+	if _, ok := req.Header["Content-Type"]; !ok {
+		req.Header.Set("Content-Type", "application/json")
+	}
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -64,9 +69,10 @@ func (c *Client) doRequest(req *http.Request) ([]byte, error) {
 		return nil, err
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
+	for _, expected := range expect {
+		if res.StatusCode == expected {
+			return body, err
+		}
 	}
-
-	return body, err
+	return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
 }

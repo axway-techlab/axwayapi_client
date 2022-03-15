@@ -29,28 +29,26 @@ func (c *Client) GetConfig() (*Config, error) {
 }
 
 // UpdateConfig - Updates an Config
-func (c *Client) UpdateConfig(config *Config) (*Config, error) {
+func (c *Client) UpdateConfig(config *Config) (error) {
 	rb, err := json.Marshal(config)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/config", c.HostURL), strings.NewReader(string(rb)))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	body, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	Config := Config{}
-	err = json.Unmarshal(body, &Config)
+	err = json.Unmarshal(body, &config)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &Config, nil
+	return nil
 }
-
