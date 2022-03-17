@@ -22,23 +22,23 @@ type AuthStruct struct {
 }
 
 // NewClient -
-func NewClient(host, username, password *string) (*Client, error) {
-	if host == nil {
+func NewClient(host, username, password string) (*Client, error) {
+	if host == "" {
 		return nil, fmt.Errorf("a host must be given")
 	}
 
 	c := Client{
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-		HostURL: *host,
+		HostURL: host,
 	}
 
-	if username == nil || password == nil {
+	if username == "" || password == "" {
 		return &c, nil
 	}
 
 	c.Auth = AuthStruct{
-		Username: *username,
-		Password: *password,
+		Username: username,
+		Password: password,
 	}
 
 	return &c, nil

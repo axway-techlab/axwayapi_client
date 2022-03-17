@@ -80,45 +80,22 @@ type Org struct {
 	TrialDuration  int    `json:"trialDuration,omitempty"`
 	IsTrial        bool   `json:"isTrial,omitempty"`
 }
-
-// Order -
-//type Config struct {
-//	registrationEnabled    bool         `json:"registrationEnabled,omitempty"`
-//	Items []ConfigItem `json:"items,omitempty"`
-//}
-
-// OrderItem -
-//type ConfigItem struct {
-//	Coffee   Coffee `json:"coffee"`
-//	Quantity int    `json:"quantity"`
-//}
-
-// Coffee -
-type Coffee struct {
-	ID          int                `json:"id"`
-	Name        string             `json:"name"`
-	Teaser      string             `json:"teaser"`
-	Collection  string             `json:"collection"`
-	Origin      string             `json:"origin"`
-	Color       string             `json:"color"`
-	Description string             `json:"description"`
-	Price       float64            `json:"price"`
-	Image       string             `json:"image"`
-	Ingredient  []CoffeeIngredient `json:"ingredients"`
-}
-
-// Ingredient -
-type CoffeeIngredient struct {
-	ID       int    `json:"ingredient_id"`
-	Name     string `json:"name"`
-	Quantity int    `json:"quantity"`
-	Unit     string `json:"unit"`
-}
-
-// Ingredient -
-type Ingredient struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Quantity int    `json:"quantity"`
-	Unit     string `json:"unit"`
+type User struct {
+	Id             string                 `json:"id,omitempty"`
+	OrganizationId string                 `json:"organizationId"`
+	Name           string                 `json:"name"`
+	Description    string                 `json:"description,omitempty"`
+	LoginName      string                 `json:"loginName"`
+	Email          string                 `json:"email,omitempty"`
+	Phone          string                 `json:"phone,omitempty"`
+	Mobile         string                 `json:"mobile,omitempty"`
+	Role           string                 `json:"role"`
+	Image          string                 `json:"image,omitempty"`
+	Enabled        bool                   `json:"enabled"`
+	CreatedOn      int                    `json:"createdOn,omitempty"`
+	State          string                 `json:"state,omitempty"`
+	Type           string                 `json:"type,omitempty"`
+	Orgs2Role      map[string]string      `json:"orgs2Role,omitempty"`
+	AuthAttrs      map[string]interface{} `json:"authAttrs,omitempty"`
+	Dn             string                 `json:"dn,omitempty"`
 }
