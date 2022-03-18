@@ -1,9 +1,11 @@
 package axwayapi
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -22,14 +24,22 @@ type AuthStruct struct {
 }
 
 // NewClient -
-func NewClient(host, username, password string) (*Client, error) {
+func NewClient(host, username, password string, proxy *url.URL, insecureSkipVerify bool) (*Client, error) {
 	if host == "" {
 		return nil, fmt.Errorf("a host must be given")
 	}
 
 	c := Client{
-		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-		HostURL:    host,
+		HTTPClient: &http.Client{
+			Timeout: 10 * time.Second,
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(proxy),
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: insecureSkipVerify,
+				},
+			},
+		},
+		HostURL: host,
 	}
 
 	if username == "" || password == "" {
