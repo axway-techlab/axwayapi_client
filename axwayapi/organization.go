@@ -139,7 +139,7 @@ func (c *Client) DeleteOrg(id string) error {
 		return err
 	}
 
-	_, err = c.doRequest(req, 204)
+	_, err = c.doRequest(req)
 	if err != nil {
 		return err
 	}

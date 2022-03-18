@@ -29,7 +29,7 @@ func NewClient(host, username, password string) (*Client, error) {
 
 	c := Client{
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-		HostURL: host,
+		HostURL:    host,
 	}
 
 	if username == "" || password == "" {
@@ -44,16 +44,16 @@ func NewClient(host, username, password string) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) doRequest(req *http.Request, expect... int) ([]byte, error) {
+func (c *Client) doRequest(req *http.Request, expect ...int) ([]byte, error) {
 	username := c.Auth.Username
 	password := c.Auth.Password
 
 	if len(expect) == 0 {
-		// when no expected status code is given, 200 is implied.
-		expect = append(expect, http.StatusOK)
+		// when no expected status code is given, some classical 20x are implied.
+		expect = []int{http.StatusOK, http.StatusNoContent, http.StatusCreated}
 	}
 
-	req.SetBasicAuth(username,password)
+	req.SetBasicAuth(username, password)
 	if _, ok := req.Header["Content-Type"]; !ok {
 		req.Header.Set("Content-Type", "application/json")
 	}
