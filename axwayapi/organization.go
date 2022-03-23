@@ -11,6 +11,25 @@ import (
 	"strings"
 )
 
+type Org struct {
+	Id             string `json:"id,omitempty"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	Email          string `json:"email"`
+	Image          string `json:"image"`
+	Restricted     bool   `json:"restricted,omitempty"`
+	VirtualHost    string `json:"virtualHost"`
+	Phone          string `json:"phone"`
+	Enabled        bool   `json:"enabled"`
+	Development    bool   `json:"development"`
+	Dn             string `json:"dn,omitempty"`
+	CreatedOn      int    `json:"createdOn,omitempty"`
+	StartTrialDate int    `json:"startTrialDate,omitempty"`
+	EndTrialDate   int    `json:"endTrialDate,omitempty"`
+	TrialDuration  int    `json:"trialDuration,omitempty"`
+	IsTrial        bool   `json:"isTrial,omitempty"`
+}
+
 func (c *Client) CreateOrg(org *Org) error {
 	rb, err := json.Marshal(org)
 	if err != nil {

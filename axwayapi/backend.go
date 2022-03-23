@@ -10,6 +10,28 @@ import (
 	"strings"
 )
 
+//---
+type Backend struct {
+	Id                    string                 `json:"id,omitempty"`
+	Name                  string                 `json:"name,omitempty"`
+	Summary               string                 `json:"summary,omitempty"`
+	Description           string                 `json:"description,omitempty"`
+	Version               string                 `json:"version,omitempty"`
+	BasePath              string                 `json:"basePath,omitempty"`
+	ResourcePath          string                 `json:"resourcePath,omitempty"`
+	Consumes              []string               `json:"consumes,omitempty"`
+	Produces              []string               `json:"produces,omitempty"`
+	Integral              bool                   `json:"integral,omitempty"`
+	CreatedOn             int                    `json:"createdOn,omitempty"`
+	CreatedBy             string                 `json:"createdBy,omitempty"`
+	OrganizationId        string                 `json:"organizationId,omitempty"`
+	ServiceType           string                 `json:"serviceType,omitempty"`
+	HasOriginalDefinition bool                   `json:"hasOriginalDefinition,omitempty"`
+	ImportUrl             string                 `json:"importUrl,omitempty"`
+	Properties            map[string]interface{} `json:"properties,omitempty"`
+	Models                map[string]interface{} `json:"models,omitempty"`
+}
+
 func (c *Client) CreateBackend(orgid, name, apitype, file string) (*Backend, error) {
 	// New multipart writer.
 	body := &bytes.Buffer{}

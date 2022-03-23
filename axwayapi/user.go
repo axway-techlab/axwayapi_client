@@ -12,6 +12,26 @@ import (
 	"strings"
 )
 
+type User struct {
+	Id             string                 `json:"id,omitempty"`
+	OrganizationId string                 `json:"organizationId"`
+	Name           string                 `json:"name"`
+	Description    string                 `json:"description,omitempty"`
+	LoginName      string                 `json:"loginName"`
+	Email          string                 `json:"email,omitempty"`
+	Phone          string                 `json:"phone,omitempty"`
+	Mobile         string                 `json:"mobile,omitempty"`
+	Role           string                 `json:"role"`
+	Image          string                 `json:"image,omitempty"`
+	Enabled        bool                   `json:"enabled"`
+	CreatedOn      int                    `json:"createdOn,omitempty"`
+	State          string                 `json:"state,omitempty"`
+	Type           string                 `json:"type,omitempty"`
+	Orgs2Role      map[string]string      `json:"orgs2Role,omitempty"`
+	AuthAttrs      map[string]interface{} `json:"authAttrs,omitempty"`
+	Dn             string                 `json:"dn,omitempty"`
+}
+
 func (c *Client) CreateUser(user *User) error {
 	rb, err := json.Marshal(user)
 	if err != nil {
