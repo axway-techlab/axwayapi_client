@@ -1,14 +1,7 @@
 package axwayapi
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"mime/multipart"
-	"net/http"
-	"net/textproto"
-	"strings"
 )
 
 type Org struct {
@@ -31,137 +24,34 @@ type Org struct {
 }
 
 func (c *Client) CreateOrg(org *Org) error {
-	rb, err := json.Marshal(org)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/organizations", c.HostURL), strings.NewReader(string(rb)))
-	if err != nil {
-		return err
-	}
-
-	body, err := c.doRequest(req, 201)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(body, &org)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.post(org, "organizations")
 }
 
-func (c *Client) GetOrg(id string) (*Org, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/organizations/%s", c.HostURL, id), nil)
+func (c *Client) GetOrg(id string) (ret *Org, err error) {
+	ret = &Org{}
+	err = c.get(ret, fmt.Sprintf("organizations/%s", id))
 	if err != nil {
 		return nil, err
 	}
-
-	body, err := c.doRequest(req)
-	if err != nil {
-		return nil, err
-	}
-
-	Org := Org{}
-	err = json.Unmarshal(body, &Org)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Org, nil
+	return ret, nil
 }
 
 func (c *Client) ListOrgs() (ret []Org, err error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/organizations/", c.HostURL), nil)
+	err = c.get(ret, "organizations")
 	if err != nil {
 		return nil, err
 	}
-
-	body, err := c.doRequest(req)
-	if err != nil {
-		return nil, err
-	}
-
-	orgs := make([]Org, 0)
-	err = json.Unmarshal(body, &orgs)
-	if err != nil {
-		return nil, err
-	}
-
-	return orgs, nil
-}
-
-func (c *Client) UpdateOrg(org *Org) error {
-	rb, err := json.Marshal(org)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/organizations/%s", c.HostURL, org.Id), strings.NewReader(string(rb)))
-	if err != nil {
-		return err
-	}
-
-	body, err := c.doRequest(req)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(body, &org)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c *Client) UpdateOrgImage(id string, image string) error {
-	// New multipart writer.
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-
-	img, err := base64.StdEncoding.DecodeString(image)
-	if err != nil {
-		return err
-	}
-
-	//---
-	partHeader := textproto.MIMEHeader{}
-	partHeader.Add("Content-Disposition", "form-data; name=\"file\"; filename=\"image.jpg\"")
-	partHeader.Add("Content-Type", "image/jpeg")
-	part, err := writer.CreatePart(partHeader)
-	if err != nil {
-		return err
-	}
-	part.Write(img)
-	writer.Close()
-
-	//---
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/organizations/%s/image/", c.HostURL, id), body)
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	_, err = c.doRequest(req)
-	if err != nil {
-		return err
-	}
-	return nil
+	return ret, nil
 }
 
 func (c *Client) DeleteOrg(id string) error {
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/organizations/%s", c.HostURL, id), nil)
-	if err != nil {
-		return err
-	}
+	return c.delete(fmt.Sprintf("organizations/%s", id))
+}
 
-	_, err = c.doRequest(req)
-	if err != nil {
-		return err
-	}
+func (c *Client) UpdateOrg(org *Org) error {
+	return c.put(org, fmt.Sprintf("organizations/%s", org.Id))
+}
 
-	return nil
+func (c *Client) UpdateOrgImage(id string, image string) error {
+	return c.updateImage(fmt.Sprintf("organizations/%s/image", id), image)
 }

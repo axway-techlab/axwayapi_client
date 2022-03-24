@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
 
 	"github.com/axway-techlab/axwayapi_client/axwayapi"
 )
@@ -24,7 +25,37 @@ const (
 
 var client *axwayapi.Client
 
+type A struct {
+	Id string
+	Name string
+}
+func (a A) GetId() string {
+	return a.Id
+}
+
+type WithId interface {
+	GetId()string
+}
+
+func get(object WithId) (error) {
+	enc := json.NewEncoder(os.Stdout)
+	enc.Encode(object)
+	j := `{"id":"4","name":"toto"}`
+	return json.Unmarshal([]byte(j), object)
+}
 func main() {
+
+	application := A{Id: "i", Name: "N"}
+	err := get(application)
+	if err != nil {
+		panic(err)
+	}
+
+	enc := json.NewEncoder(os.Stdout)
+	if err := enc.Encode(application); err != nil {
+		panic(err)
+	} 
+	return
 	url, err := url.Parse(proxy)
 	if err != nil {
 		panic(err)
@@ -33,10 +64,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	
 	client = c
 
-	org := createOrg()
-	defer deleteOrg(org)
+	apis, _ := c.ListApisInApplication("5da48a4f-fa98-47e6-a85c-8426f0be8559")
+
+	fmt.Printf("%#+q", apis)
 
 	//	backend := createBackend(org.Id)
 	//	frontend := createFrontend(org.Id, backend.Id)

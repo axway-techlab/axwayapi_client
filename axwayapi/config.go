@@ -1,12 +1,5 @@
 package axwayapi
 
-import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-	"strings"
-)
-
 type Config struct {
 	RegistrationEnabled               bool            `json:"registrationEnabled,omitempty"`
 	RegTokenEmailEnabled              bool            `json:"regTokenEmailEnabled,omitempty"`
@@ -69,47 +62,16 @@ type LockUserAccount struct {
 }
 
 // GetConfig - Returns a specifc Config
-func (c *Client) GetConfig() (*Config, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/config", c.HostURL), nil)
+func (c *Client) GetConfig() (ret *Config, err error) {
+	ret = &Config{}
+	err = c.get(ret, "config")
 	if err != nil {
 		return nil, err
 	}
-
-	body, err := c.doRequest(req)
-	if err != nil {
-		return nil, err
-	}
-
-	Config := Config{}
-	err = json.Unmarshal(body, &Config)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Config, nil
+	return ret, nil
 }
 
 // UpdateConfig - Updates an Config
 func (c *Client) UpdateConfig(config *Config) (error) {
-	rb, err := json.Marshal(config)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/config", c.HostURL), strings.NewReader(string(rb)))
-	if err != nil {
-		return err
-	}
-
-	body, err := c.doRequest(req)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(body, &config)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.put(config, "config")
 }
