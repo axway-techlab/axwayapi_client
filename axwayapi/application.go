@@ -14,7 +14,6 @@ type Application struct {
 	Phone          string `json:"phone,omitempty"`
 	Email          string `json:"email,omitempty"`
 	Enabled        bool   `json:"enabled,omitempty"`
-	Image          string `json:"image,omitempty"`
 	State          string `json:"state,omitempty"`
 	//	Tags           map[string]string `json:"tags,omitempty"`
 	CreatedBy string    `json:"createdBy,omitempty"`
@@ -22,6 +21,9 @@ type Application struct {
 	ManagedBy []string  `json:"managedBy,omitempty"`
 	Apis      *[]string `json:"apis,omitempty"`
 }
+func (this *Application) GetId() string {
+	return this.Id
+} 
 
 type ApiLink struct {
 	Id        string `json:"id,omitempty"`
@@ -77,7 +79,7 @@ func (c *Client) UpdateApplication(application *Application) (err error) {
 }
 
 func (c *Client) UpdateApplicationImage(id string, image string) error {
-	return c.updateImage(fmt.Sprintf("applications/%s/image", id), image)
+	return c.updateImage(fmt.Sprintf("applications/%s/image/", id), image)
 }
 
 // ApiKeys <-> Applications

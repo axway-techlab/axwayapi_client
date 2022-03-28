@@ -138,6 +138,25 @@ func (c *Client) sendParts(url string, mpart multiPart) ([]byte, error) {
 	return c.doRequest(req)
 }
 
+type WithId interface {
+	GetId() string
+}
+
+func (c *Client) UpdateImageFor(t WithId, image string) error {
+	var path string
+	switch t.(type) {
+	case *Frontend:
+		path = "proxies"
+	case *Application:
+		path = "applications"
+	case *User:
+		path = "users"
+	case *Org:
+		path = "organizations"
+	}
+	return c.updateImage(fmt.Sprintf("%s/%s/image/", path, t.GetId()), image)
+}
+
 func (c *Client) updateImage(url, imageB64 string) error {
 	img, err := base64.StdEncoding.DecodeString(imageB64)
 	if err != nil {
@@ -186,7 +205,7 @@ type multiPartEncoded struct {
 	body                *bytes.Buffer
 }
 
-func (mpart multiPart) writeMultiPart()  (enc *multiPartEncoded, err error) {
+func (mpart multiPart) writeMultiPart() (enc *multiPartEncoded, err error) {
 	body := &bytes.Buffer{}
 	enc = &multiPartEncoded{}
 	writer := multipart.NewWriter(body)

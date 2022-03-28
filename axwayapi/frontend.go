@@ -22,7 +22,6 @@ type Frontend struct {
 	Summary                string                     `json:"summary,omitempty"`
 	Retired                bool                       `json:"retired,omitempty"`
 	Expired                bool                       `json:"expired,omitempty"`
-	Image                  string                     `json:"image,omitempty"`
 	RetirementDate         int                        `json:"retirementDate,omitempty"`
 	Deprecated             bool                       `json:"deprecated,omitempty"`
 	State                  string                     `json:"state,omitempty"`
@@ -38,6 +37,9 @@ type Frontend struct {
 	CreatedBy              string                     `json:"createdBy,omitempty"`
 	CreatedOn              int                        `json:"createdOn,omitempty"`
 }
+func (this *Frontend) GetId() string {
+	return this.Id
+} 
 
 type CorsProfile struct {
 	//ValueObject
@@ -155,6 +157,7 @@ func (c *Client) UpdateFrontend(frontend *Frontend) error {
 func (c *Client) UpdateFrontendImage(id string, image string) error {
 	return c.updateImage(fmt.Sprintf("proxies/%s/image", id), image)
 }
+
 
 //-- Operations
 func (c *Client) PublishFrontend(frontend *Frontend) error {

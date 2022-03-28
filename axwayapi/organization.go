@@ -9,7 +9,6 @@ type Org struct {
 	Name           string `json:"name"`
 	Description    string `json:"description"`
 	Email          string `json:"email"`
-	Image          string `json:"image"`
 	Restricted     bool   `json:"restricted,omitempty"`
 	VirtualHost    string `json:"virtualHost"`
 	Phone          string `json:"phone"`
@@ -22,6 +21,9 @@ type Org struct {
 	TrialDuration  int    `json:"trialDuration,omitempty"`
 	IsTrial        bool   `json:"isTrial,omitempty"`
 }
+func (this *Org) GetId() string {
+	return this.Id
+} 
 
 func (c *Client) CreateOrg(org *Org) error {
 	return c.post(org, "organizations")
@@ -53,5 +55,5 @@ func (c *Client) UpdateOrg(org *Org) error {
 }
 
 func (c *Client) UpdateOrgImage(id string, image string) error {
-	return c.updateImage(fmt.Sprintf("organizations/%s/image", id), image)
+	return c.updateImage(fmt.Sprintf("organizations/%s/image/", id), image)
 }

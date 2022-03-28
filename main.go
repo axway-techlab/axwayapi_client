@@ -3,8 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
-	"os"
 
 	"github.com/axway-techlab/axwayapi_client/axwayapi"
 )
@@ -25,237 +23,51 @@ const (
 
 var client *axwayapi.Client
 
-type A struct {
-	Id string
-	Name string
+type FlexName struct {
+	Name string `json:"name"`
 }
-func (a A) GetId() string {
-	return a.Id
+type FlexA struct {
+	FlexName
+	Description string `json:"desc"`
+}
+type FlexB struct {
+	FlexName
+	Label string `json:"label"`
 }
 
-type WithId interface {
-	GetId()string
+type Outer struct {
+	Name []interface{}
 }
 
-func get(object WithId) (error) {
-	enc := json.NewEncoder(os.Stdout)
-	enc.Encode(object)
-	j := `{"id":"4","name":"toto"}`
-	return json.Unmarshal([]byte(j), object)
-}
 func main() {
-
-	application := A{Id: "i", Name: "N"}
-	err := get(application)
-	if err != nil {
-		panic(err)
-	}
-
-	enc := json.NewEncoder(os.Stdout)
-	if err := enc.Encode(application); err != nil {
-		panic(err)
-	} 
-	return
-	url, err := url.Parse(proxy)
-	if err != nil {
-		panic(err)
-	}
-	c, err := axwayapi.NewClient(host, username, password, url, true)
-	if err != nil {
-		panic(err)
-	}
-	
-	client = c
-
-	apis, _ := c.ListApisInApplication("5da48a4f-fa98-47e6-a85c-8426f0be8559")
-
-	fmt.Printf("%#+q", apis)
-
-	//	backend := createBackend(org.Id)
-	//	frontend := createFrontend(org.Id, backend.Id)
-	//
-	//	b, err := json.Marshal(frontend)
-	//	if nil != err {
-	//		panic(err)
-	//	}
-	//	println(string(b))
-	//
-	//	println("done")
-}
-
-// ########### FRONTENDS
-func createFrontend(orgId, backendId string) (frontend *axwayapi.Frontend) {
-	fmt.Printf("### CREATION (frontend)###\n")
-	frontend = &axwayapi.Frontend{
-		OrganizationId: orgId,
-		ApiId:          backendId,
-		State:          "unpublished",
-		SecurityProfiles: []axwayapi.SecurityProfile{{
-			Name:      "_default",
-			IsDefault: true,
-			Devices: []axwayapi.Device{{
-				Name:  "Pass Through",
-				Type:  "passThrough",
-				Order: 1,
-				Properties: map[string]interface{}{
-					"subjectIdFieldName":         "Pass Through",
-					"removeCredentielsOnSuccess": true,
+	s := []byte(`{
+		"description": null,
+		"id": "ed31ed81-31f2-40d1-aa3f-39f1c48db13e",
+		"name": "other quota",
+		"restrictions": [
+			{
+				"api": "3feb28df-5df7-4b9d-93ac-b3ad53129be6",
+				"config": {
+					"mb": "10",
+					"per": "1",
+					"period": "sec"
 				},
-			}},
-		}},
-	}
-	err := client.CreateFrontend(frontend)
-	if err != nil {
-		panic(err)
-	} else {
-		rb, _ := json.Marshal(frontend)
-		fmt.Printf("%v\n", string(rb))
-	}
-	return frontend
-}
+				"method": "*",
+				"type": "throttlemb"
+			}
+		],
+		"system": false,
+		"type": "API"
+	}`)
+	c := &axwayapi.Quota{}
 
-func deleteFrontend(frontend *axwayapi.Frontend) {
-	fmt.Printf("### DELETION (frontend)###\n")
-	err := client.DeleteFrontend(frontend.Id)
-	if err != nil {
-		panic(err)
-	}
-}
+	json.Unmarshal(s, c)
 
-// ########### BACKENDS
-func createBackend(orgId string) *axwayapi.Backend {
-	fmt.Printf("### CREATION (backend)###\n")
-	backend, err := client.CreateBackend(orgId, "sample", "swagger", minimalapi)
-	if err != nil {
-		panic(err)
-	} else {
-		rb, _ := json.Marshal(backend)
-		fmt.Printf("%v\n", string(rb))
-	}
-	return backend
-}
-
-func deleteBackend(backend *axwayapi.Backend) {
-	fmt.Printf("### DELETION (backend)###\n")
-	err := client.DeleteBackend(backend.Id)
-	if err != nil {
-		panic(err)
-	}
-}
-
-// ########### USERS
-func createUser(orgId string) *axwayapi.User {
-	fmt.Printf("### CREATION (User) ###\n")
-	user := &axwayapi.User{
-		Name:           "bob the user",
-		LoginName:      "bob",
-		OrganizationId: orgId,
-		Email:          "bob@sponge.sea",
-		Role:           "user",
-		Enabled:        true,
-	}
-	err := client.CreateUser(user)
-	if err != nil {
-		panic(err)
-	} else {
-		rb, _ := json.Marshal(user)
-		fmt.Printf("%v\n", string(rb))
-	}
-	return user
-}
-
-func updateUser(user *axwayapi.User) {
-	user.Email = "a@a.com"
-
-	fmt.Printf("### UPDATE (User) ###\n")
-	err := client.UpdateUser(user)
-	if err != nil {
-		panic(err)
-	} else {
-		rb, _ := json.Marshal(user)
-		fmt.Printf("%v\n", string(rb))
+	a, e := json.Marshal(c)
+	if nil != e {
+		panic(e)
 	}
 
-	fmt.Printf("### UPDATE IMAGE (User) ###\n")
-	err = client.UpdateUserImage(user.Id, cat)
-	if err != nil {
-		panic(err)
-	}
-}
+	fmt.Printf("%+#v\n %+#v\n %s", c.Restrictions[0],c.Restrictions[0].Config, string(a))
 
-func listUsers() []axwayapi.User {
-	fmt.Printf("### LIST (User) ###\n")
-	users, err := client.ListUsers()
-	if err != nil {
-		panic(err)
-	} else {
-		rb, _ := json.Marshal(users)
-		fmt.Printf("%v\n", string(rb))
-	}
-	return users
-}
-
-func deleteUser(user *axwayapi.User) {
-	fmt.Printf("### DELETION (User) ###\n")
-	err := client.DeleteUser(user.Id)
-	if err != nil {
-		panic(err)
-	}
-}
-
-// ########### ORGS
-func createOrg() *axwayapi.Org {
-	fmt.Printf("### CREATION (Org) ###\n")
-	org := &axwayapi.Org{
-		Name:        "ddd",
-		Enabled:     true,
-		Development: true,
-	}
-	err := client.CreateOrg(org)
-	if err != nil {
-		panic(err)
-	} else {
-		rb, _ := json.Marshal(org)
-		fmt.Printf("%v\n", string(rb))
-	}
-	return org
-}
-
-func updateOrg(org *axwayapi.Org) {
-	org.Email = "a@a.com"
-
-	fmt.Printf("### UPDATE (Org) ###\n")
-	err := client.UpdateOrg(org)
-	if err != nil {
-		panic(err)
-	} else {
-		rb, _ := json.Marshal(org)
-		fmt.Printf("%v\n", string(rb))
-	}
-
-	fmt.Printf("### UPDATE IMAGE (Org) ###\n")
-	err = client.UpdateOrgImage(org.Id, cat)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func listOrgs() []axwayapi.Org {
-	fmt.Printf("### LIST (Org) ###\n")
-	orgs, err := client.ListOrgs()
-	if err != nil {
-		panic(err)
-	} else {
-		rb, _ := json.Marshal(orgs)
-		fmt.Printf("%v\n", string(rb))
-	}
-	return orgs
-}
-
-func deleteOrg(org *axwayapi.Org) {
-	fmt.Printf("### DELETION (Org) ###\n")
-	err := client.DeleteOrg(org.Id)
-	if err != nil {
-		panic(err)
-	}
 }

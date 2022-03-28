@@ -17,7 +17,6 @@ type User struct {
 	Phone          string                 `json:"phone,omitempty"`
 	Mobile         string                 `json:"mobile,omitempty"`
 	Role           string                 `json:"role"`
-	Image          string                 `json:"image,omitempty"`
 	Enabled        bool                   `json:"enabled"`
 	CreatedOn      int                    `json:"createdOn,omitempty"`
 	State          string                 `json:"state,omitempty"`
@@ -26,6 +25,9 @@ type User struct {
 	AuthAttrs      map[string]interface{} `json:"authAttrs,omitempty"`
 	Dn             string                 `json:"dn,omitempty"`
 }
+func (this *User) GetId() string {
+	return this.Id
+} 
 
 func (c *Client) CreateUser(user *User) error {
 	return c.post(user, "users")
