@@ -57,7 +57,7 @@ func (cc *Constraint) UnmarshalJSON(b []byte) error {
 			Period: m["period"],
 		}
 	case "throttle":
-		n, err := strconv.Atoi(m["msg"])
+		n, err := strconv.Atoi(m["messages"])
 		if err != nil {
 			return err
 		}
@@ -80,7 +80,7 @@ type ConstraintConfigMb struct {
 type ConstraintConfigMsg struct {
 	Per    int    `json:"per"`
 	Period string `json:"period"`
-	Msg    int    `json:"msg"`
+	Msg    int    `json:"messages"`
 }
 
 func (c *Client) CreateQuota(quota *Quota) error {

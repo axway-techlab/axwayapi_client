@@ -143,3 +143,39 @@ func (c *Client) ListApisInApplication(appId string) ([]string, error) {
 	sort.Strings(ids)
 	return ids, nil
 }
+
+//-apps <-> Quota
+func (c *Client) AddQuotaToApplication(application *Application, quota *Quota) error {
+	return c.post(
+		quota,
+		fmt.Sprintf("applications/%s/quota", application.Id),
+		http.StatusCreated,
+	)
+}
+
+func (c *Client) UpdateQuotaForApplication(application *Application, quota *Quota) error {
+	return c.put(
+		quota,
+		fmt.Sprintf("applications/%s/quota", application.Id),
+		http.StatusCreated,
+	)
+}
+
+func (c *Client) DeleteQuotaFromApplication(appId string) error {
+	return c.delete(
+		fmt.Sprintf("applications/%s/quota", appId),
+		http.StatusNoContent)
+}
+
+func (c *Client) GetQuotaForApplication(appId string, quota *Quota) (error) {
+	c.get(
+		&quota,
+		fmt.Sprintf("applications/%s/quota", appId),
+		http.StatusOK, http.StatusBadRequest,
+	)
+	return c.get(
+		&quota,
+		fmt.Sprintf("applications/%s/quota", appId),
+		http.StatusOK, http.StatusBadRequest,
+	)
+}
