@@ -2,3 +2,5 @@
 .vscode/
 /axwayapi_client
 *.nogo
+
+dist/
