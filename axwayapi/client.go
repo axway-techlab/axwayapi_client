@@ -31,7 +31,7 @@ func NewClient(host, username, password string, proxy *url.URL, insecureSkipVeri
 
 	c := Client{
 		HTTPClient: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: 2 * time.Minute,
 			Transport: &http.Transport{
 				Proxy: http.ProxyURL(proxy),
 				TLSClientConfig: &tls.Config{
@@ -52,6 +52,19 @@ func NewClient(host, username, password string, proxy *url.URL, insecureSkipVeri
 	}
 
 	return &c, nil
+}
+
+func (client *Client) WaitForReadiness(while time.Duration) error {
+	deadline := time.Now().Add(while)
+	for deadline.After(time.Now()) {
+		_, err := client.GetConfig()
+		if err == nil {
+			return nil
+		} else {
+			time.Sleep(2 * time.Second)
+		}
+	}
+	return fmt.Errorf("timeout reached: Cannot reach %s", client.HostURL)
 }
 
 func (c *Client) doRequest(req *http.Request, expect ...int) ([]byte, error) {

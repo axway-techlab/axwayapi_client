@@ -12,6 +12,16 @@ import (
 	"strings"
 )
 
+func assertIsPointerOrNil(object interface{}) error {
+	if object == nil {
+		return nil
+	}
+	rv := reflect.ValueOf(object)
+	if rv.Kind() != reflect.Ptr {
+		return fmt.Errorf("should provide a pointer as 'object', got a %s", rv.Kind())
+	}
+	return nil
+}
 func assertIsPointer(object interface{}) error {
 	rv := reflect.ValueOf(object)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
@@ -47,11 +57,15 @@ func (c *Client) post(object interface{}, url string, expected ...int) error {
 }
 
 func (c *Client) get(object interface{}, url string, expected ...int) error {
-	if err := assertIsPointer(object); err != nil {
+	if err := assertIsPointerOrNil(object); err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("GET", c.HostURL+"/"+url, nil)
+	address := c.HostURL  
+	if url != "" { 
+		address += "/"+url
+	}
+	req, err := http.NewRequest("GET", address, nil)
 	if err != nil {
 		return err
 	}
@@ -61,9 +75,11 @@ func (c *Client) get(object interface{}, url string, expected ...int) error {
 		return err
 	}
 
-	err = json.Unmarshal(body, object)
-	if err != nil {
-		return err
+	if object != nil {
+		err = json.Unmarshal(body, object)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

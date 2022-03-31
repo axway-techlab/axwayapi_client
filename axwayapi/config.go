@@ -64,7 +64,7 @@ type LockUserAccount struct {
 // GetConfig - Returns a specifc Config
 func (c *Client) GetConfig() (ret *Config, err error) {
 	ret = &Config{}
-	err = c.get(ret, "config")
+	err = c.get(ret, "config", 200)
 	if err != nil {
 		return nil, err
 	}
